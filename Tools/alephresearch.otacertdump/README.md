@@ -1,4 +1,6 @@
-Roee Hay / Aleph Research, HCL Technologies
+**otacertdump**
+
+By Roee Hay / Aleph Research, HCL Technologies
 
 Takes a signed Android OTA, and dumps the certificate information.
 
