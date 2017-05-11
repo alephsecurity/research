@@ -11,7 +11,7 @@ def response(flow):
     flow.response.content = b"{\"type\":\"1\",\
                                \"wipe\":\"0\",\
                                \"new_version\":\"foo\",\
-                               \"version_name\":\"foo!\",
+                               \"version_name\":\"foo!\",\
                                \"description\":\"foo\",\
                                \"extract\":\"foo\",\
                                \"patch_name\":\"foo.zip\",\
