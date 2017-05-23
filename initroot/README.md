@@ -1,5 +1,7 @@
 # PoC for initroot: Google Nexus 6 Kernel Command Line Injection Secure Boot Bypass (CVE-2016-10277) #
 
+By Roee Hay / Aleph Research, HCL Technologies 
+
 Steps:
 
 1. Use the commited `initroot.cpio.gz`, or produce your own:
