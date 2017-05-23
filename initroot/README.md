@@ -14,9 +14,9 @@ $ cd ..
 
 Our commited initramfs contains an AOSP userdebug root partition with adb running as root by default. It will not ask for authorization. In addition, dm-verity is disabled on the system partition.
 
-2. fastboot oem config fsg-id "a initrd=0x11000000,<initroot.cpio.gz size>"
-3. fastboot flash foo initroot.cpio.gz
-4. fastboot continue
+2. `fastboot oem config fsg-id "a initrd=0x11000000,<initroot.cpio.gz size>"`
+3. `fastboot flash foo initroot.cpio.gz`
+4. `fastboot continue`
 5. if you use our initramfs, `adb shell` will now give you a root shell:
 
 ```
