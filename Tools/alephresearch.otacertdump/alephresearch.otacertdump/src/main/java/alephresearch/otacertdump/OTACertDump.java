@@ -1,3 +1,13 @@
+/*
+    Roee Hay / Aleph Research, HCL Technologies
+
+    Takes a signed Android OTA, and prints the certificate information
+
+    ripped from:
+    /AOSP/frameworks/base/core/java/android/os/RecoverySystem.java
+
+*/
+
 package alephresearch.otacertdump;
 
 import java.io.ByteArrayInputStream;
@@ -8,17 +18,6 @@ import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 
 import sun.security.pkcs.PKCS7;
-
-
-/*
-    Roee Hay / Aleph Research, HCL Technologies
-
-    Takes a signed Android OTA, and prints the certificate information
-
-    ripped from:
-    /AOSP/frameworks/base/core/java/android/os/RecoverySystem.java
-
-*/
 
 public class OTACertDump {
 
