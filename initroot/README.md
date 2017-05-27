@@ -1,4 +1,4 @@
-# PoC for initroot: Google Nexus 6 Kernel Command Line Injection Secure Boot Bypass (CVE-2016-10277) #
+# PoC for initroot: Nexus 6 Motorola Bootloader Kernel Command Line Injection Secure Boot Bypass (CVE-2016-10277) #
 
 By Roee Hay / Aleph Research, HCL Technologies 
 
@@ -27,5 +27,7 @@ uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdca
 
 
 Blog post with details is available [here](https://alephsecurity.com/2017/05/23/nexus6-initroot/)
+
+
 
 
