@@ -25,7 +25,10 @@ shamu:/ # id
 uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdcard_rw),1028(sdcard_r),3001(net_bt_admin),3002(net_bt),3003(inet),3006(net_bw_stats),3009(readproc) context=u:r:su:s0
 ```
 
-**Note**: This vulnerability may affect other Motorola devices. A different initramfs will be needed. A different physical address of initrd (0x11000000 on Nexus 6) may vary as well.
+**Note**:
+This vulnerability affects other Motorola devices too, confirmed on:
+* Moto G4 w/ moto-msm8952-B1.05.
+A different initramfs will be needed. A different physical address of initrd (0x11000000 on Nexus 6) may vary as well.
 
 Blog post with details is available [here](https://alephsecurity.com/2017/05/23/nexus6-initroot/)
 
