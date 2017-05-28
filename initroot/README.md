@@ -1,8 +1,8 @@
-# PoC for initroot: Nexus 6 Motorola Bootloader Kernel Command Line Injection Secure Boot Bypass (CVE-2016-10277) #
+# PoC for initroot: Motorola Bootloader Kernel Command Line Injection Secure Boot Bypass (CVE-2016-10277) #
 
 By Roee Hay / Aleph Research, HCL Technologies 
 
-Steps:
+Steps on Nexus 6:
 
 1. Use the commited `initroot.cpio.gz`, or produce your own:
 
@@ -26,9 +26,7 @@ uid=0(root) gid=0(root) groups=0(root),1004(input),1007(log),1011(adb),1015(sdca
 ```
 
 **Note**:
-This vulnerability affects other Motorola devices too, confirmed on:
-* Moto G4 w/ moto-msm8952-B1.05.
-A different initramfs will be needed. A different physical address of initrd (0x11000000 on Nexus 6) may vary as well.
+This vulnerability affects other Motorola devices too: a different initramfs will be needed. A different physical address of initrd (0x11000000 on Nexus 6) may vary as well.
 
 Blog post with details is available [here](https://alephsecurity.com/2017/05/23/nexus6-initroot/)
 
