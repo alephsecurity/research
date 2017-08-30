@@ -1,3 +1,7 @@
 [submodule "initroot"]
 	path = initroot
 	url = https://github.com/alephsecurity/initroot.git
+[submodule "Tools/abootool"]
+	path = Tools/abootool
+	url = https://github.com/alephsecurity/abootool
+	branch = master
