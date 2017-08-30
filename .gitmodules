@@ -1,7 +1,7 @@
-[submodule "initroot"]
-	path = initroot
+[submodule "PoCs/initroot"]
+	path = PoCs/initroot
 	url = https://github.com/alephsecurity/initroot.git
-[submodule "Tools/abootool"]
-	path = Tools/abootool
+[submodule "tools/abootool"]
+	path = tools/abootool
 	url = https://github.com/alephsecurity/abootool
 	branch = master
