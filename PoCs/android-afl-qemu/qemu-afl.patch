@@ -1,0 +1,223 @@
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+index b591790c22..52714c7747 100644
+--- a/linux-user/aarch64/signal.c
++++ b/linux-user/aarch64/signal.c
+@@ -38,7 +38,7 @@ struct target_ucontext {
+     target_stack_t tuc_stack;
+     target_sigset_t tuc_sigmask;
+     /* glibc uses a 1024-bit sigset_t */
+-    char __unused[1024 / 8 - sizeof(target_sigset_t)];
++    char _unused[1024 / 8 - sizeof(target_sigset_t)];
+     /* last for future expansion */
+     struct target_sigcontext tuc_mcontext;
+ };
+diff --git a/linux-user/android-ashmem.h b/linux-user/android-ashmem.h
+new file mode 100644
+index 0000000000..192f687331
+--- /dev/null
++++ b/linux-user/android-ashmem.h
+@@ -0,0 +1,85 @@
++#ifdef __ANDROID__
++  #ifndef _ANDROID_ASHMEM_H
++    #define _ANDROID_ASHMEM_H
++
++    #define _GNU_SOURCE
++    #include <sys/syscall.h>
++    #include <unistd.h>
++    #include <fcntl.h>
++    #include <linux/ashmem.h>
++    #include <sys/ioctl.h>
++    #include <sys/mman.h>
++    #include <sys/shm.h>
++    #include <stdio.h>
++    #define ASHMEM_DEVICE "/dev/ashmem"
++
++int shmdt(const void *address) {
++
++    #if defined(SYS_shmdt)
++  return syscall(SYS_shmdt, address);
++    #else
++  return syscall(SYS_ipc, SHMDT, 0, 0, 0, address, 0);
++    #endif
++
++}
++
++int shmctl(int __shmid, int __cmd, struct shmid_ds *__buf) {
++
++  int ret = 0;
++  if (__cmd == IPC_RMID) {
++
++    int               length = ioctl(__shmid, ASHMEM_GET_SIZE, NULL);
++    struct ashmem_pin pin = {0, length};
++    ret = ioctl(__shmid, ASHMEM_UNPIN, &pin);
++    close(__shmid);
++
++  }
++
++  return ret;
++
++}
++
++int shmget(key_t __key, size_t __size, int __shmflg) {
++
++  (void)__shmflg;
++  int  fd, ret;
++  char ourkey[11];
++
++  fd = open(ASHMEM_DEVICE, O_RDWR);
++  if (fd < 0) return fd;
++
++  sprintf(ourkey, "%d", __key);
++  ret = ioctl(fd, ASHMEM_SET_NAME, ourkey);
++  if (ret < 0) goto error;
++
++  ret = ioctl(fd, ASHMEM_SET_SIZE, __size);
++  if (ret < 0) goto error;
++
++  return fd;
++
++error:
++  close(fd);
++  return ret;
++
++}
++
++void *shmat(int __shmid, const void *__shmaddr, int __shmflg) {
++
++  (void)__shmflg;
++  int   size;
++  void *ptr;
++
++  size = ioctl(__shmid, ASHMEM_GET_SIZE, NULL);
++  if (size < 0) { return NULL; }
++
++  ptr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, __shmid, 0);
++  if (ptr == MAP_FAILED) { return NULL; }
++
++  return ptr;
++
++}
++
++  #endif                                              /* !_ANDROID_ASHMEM_H */
++#endif                                                      /* !__ANDROID__ */
++
++
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 6e553a43dd..1330f3a7fe 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -81,7 +81,13 @@
+ #include <sys/kcov.h>
+ #endif
+ 
++
++#ifdef __ANDROID__
++#define host_termios termios
++#else
+ #define termios host_termios
++#endif
++
+ #define winsize host_winsize
+ #define termio host_termio
+ #define sgttyb host_sgttyb /* same as target */
+@@ -640,6 +646,45 @@ static uint16_t host_to_target_errno_table[ERRNO_TABLE_SIZE] = {
+ #endif
+ };
+ 
++#ifdef __ANDROID__
++
++int sigorset(sigset_t * set, const sigset_t * left, const sigset_t * right) {
++    //printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    // assert(0);
++}
++
++int vhangup(void) {
++    printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    assert(0);
++}
++
++int mq_unlink(const char *name) {
++    printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    assert(0);
++}
++
++int mq_setattr(unsigned long mqdes, const struct mq_attr *newattr,
++                        struct mq_attr *oldattr) {
++    printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    assert(0);
++}
++
++int mq_getattr(unsigned long mqdes, struct mq_attr *attr) {
++    printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    assert(0);
++}
++
++abi_long mq_open(void *name, int oflag, abi_long mode,
++                     struct mq_attr *attr) {
++    printf("[-] %s(%d)-%s\n",__FILE__,__LINE__,__FUNCTION__);
++    assert(0);
++}
++
++
++#include "android-ashmem.h"
++
++#endif
++
+ static inline int host_to_target_errno(int err)
+ {
+     if (err >= 0 && err < ERRNO_TABLE_SIZE &&
+@@ -1365,7 +1410,7 @@ static inline abi_long copy_from_user_timezone(struct timezone *tz,
+ #endif
+ 
+ #if defined(TARGET_NR_mq_open) && defined(__NR_mq_open)
+-#include <mqueue.h>
++#include <linux/mqueue.h>
+ 
+ static inline abi_long copy_from_user_mq_attr(struct mq_attr *attr,
+                                               abi_ulong target_mq_attr_addr)
+@@ -3978,12 +4023,12 @@ static inline abi_long host_to_target_seminfo(abi_ulong target_addr,
+     return 0;
+ }
+ 
+-union semun {
++/*union semun {
+ 	int val;
+ 	struct semid_ds *buf;
+ 	unsigned short *array;
+ 	struct seminfo *__buf;
+-};
++};*/
+ 
+ union target_semun {
+ 	int val;
+@@ -4257,7 +4302,7 @@ static inline abi_long target_to_host_msqid_ds(struct msqid_ds *host_md,
+     host_md->msg_stime = tswapal(target_md->msg_stime);
+     host_md->msg_rtime = tswapal(target_md->msg_rtime);
+     host_md->msg_ctime = tswapal(target_md->msg_ctime);
+-    host_md->__msg_cbytes = tswapal(target_md->__msg_cbytes);
++    host_md->msg_cbytes = tswapal(target_md->__msg_cbytes);
+     host_md->msg_qnum = tswapal(target_md->msg_qnum);
+     host_md->msg_qbytes = tswapal(target_md->msg_qbytes);
+     host_md->msg_lspid = tswapal(target_md->msg_lspid);
+@@ -4278,7 +4323,7 @@ static inline abi_long host_to_target_msqid_ds(abi_ulong target_addr,
+     target_md->msg_stime = tswapal(host_md->msg_stime);
+     target_md->msg_rtime = tswapal(host_md->msg_rtime);
+     target_md->msg_ctime = tswapal(host_md->msg_ctime);
+-    target_md->__msg_cbytes = tswapal(host_md->__msg_cbytes);
++    target_md->__msg_cbytes = tswapal(host_md->msg_cbytes);
+     target_md->msg_qnum = tswapal(host_md->msg_qnum);
+     target_md->msg_qbytes = tswapal(host_md->msg_qbytes);
+     target_md->msg_lspid = tswapal(host_md->msg_lspid);
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 6823d8646c..af0f41ea16 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -2101,7 +2101,7 @@ struct target_stat {
+     abi_ulong  target_st_mtime_nsec;
+     abi_long  target_st_ctime;
+     abi_ulong  target_st_ctime_nsec;
+-    unsigned int __unused[2];
++    unsigned int _unused[2];
+ };
+ #elif defined(TARGET_XTENSA)
+ #define TARGET_STAT_HAVE_NSEC
